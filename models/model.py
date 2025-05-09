@@ -54,7 +54,7 @@ class GDLT(nn.Module):
         q1 = self.transformer.decoder(q, encode_x)
 
         s = self.regressor(q1)  # (b, n, n)
-        s = torch.diagonal(s, dim1=-2, dim2=-1)  # (b, n)
+        s = torch.diagonal(s, dim1=-2, dim2=-1)  # (b, n) 提取张量s的对角线元素
         norm_s = torch.sigmoid(s)
         norm_s = norm_s / torch.sum(norm_s, dim=1, keepdim=True)
         out = torch.sum(self.weight.unsqueeze(0).repeat(b, 1) * norm_s, dim=1)

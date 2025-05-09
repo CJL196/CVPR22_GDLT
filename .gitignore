@@ -1,3 +1,10 @@
 
 *.iml
 *.xml
+__pycache__
+.vscode
+ckpt
+FineFS
+fis-v
+GDLT_data
+MEREAD*

@@ -53,27 +53,36 @@ if __name__ == '__main__':
     setup_seed(0)
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
-    '''
-    1. load data
-    '''
-    '''
-    train data
-    '''
-    train_data = RGDataset(args.video_path, args.train_label_path, clip_num=args.clip_num,
-                           action_type=args.action_type)
-    train_loader = DataLoader(train_data, batch_size=args.batch, shuffle=True, num_workers=8)
-    print(len(train_data))
-    # print(train_data.get_score_mean(), train_data.get_score_std())
-    # raise SystemExit
+    if args.dataset.lower() == 'finefs':
+        from FineFSLoader import get_FineFS_loader
+        if args.split.lower() == 'sp':
+            indices_path = 'indices/indices_sp_0.pkl'
+        elif args.split.lower() == 'fs':
+            indices_path = 'indices/indices_fs_0.pkl'
+        train_data, test_data, train_loader, test_loader = get_FineFS_loader(args.train_label_path, args.video_path, indices_path, args.batch, type=args.type)
+    elif args.dataset.lower() == 'gdlt':
+        '''
+        1. load data
+        '''
+        '''
+        train data
+        '''
+        train_data = RGDataset(args.video_path, args.train_label_path, clip_num=args.clip_num,
+                            action_type=args.action_type)
+        train_loader = DataLoader(train_data, batch_size=args.batch, shuffle=True, num_workers=8)
+        print(len(train_data))
+        # print(train_data.get_score_mean(), train_data.get_score_std())
+        # raise SystemExit
 
-    '''
-    test data
-    '''
-    test_data = RGDataset(args.video_path, args.test_label_path, clip_num=args.clip_num,
-                          action_type=args.action_type, train=False)
-    test_loader = DataLoader(test_data, batch_size=1, shuffle=False, num_workers=8)
-    print('=============Load dataset successfully=============')
-
+        '''
+        test data
+        '''
+        test_data = RGDataset(args.video_path, args.test_label_path, clip_num=args.clip_num,
+                            action_type=args.action_type, train=False)
+        test_loader = DataLoader(test_data, batch_size=1, shuffle=False, num_workers=8)
+        print('=============Load dataset successfully=============')
+    else:
+        raise Exception("Unknown dataset")
     '''
     2. load model
     '''

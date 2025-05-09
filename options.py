@@ -38,3 +38,7 @@ parser.add_argument('--alpha', type=float, default=0.0)
 parser.add_argument('--margin', type=float, default=0.0)
 
 parser.add_argument('--dropout', type=float, default=0.0)
+
+parser.add_argument('--dataset', type=str, default='gdlt')
+parser.add_argument('--split', type=str, default='sp')
+parser.add_argument('--type', type=str, default='pcs')

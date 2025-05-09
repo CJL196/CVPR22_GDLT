@@ -17,7 +17,7 @@ def train_epoch(epoch, model, loss_fn, train_loader, optim, logger, device, args
 
     for i, (video_feat, label) in enumerate(train_loader):
         video_feat = video_feat.to(device)      # (b, t, c)
-        label = label.float().to(device)
+        label = label.float().to(device) # (b,)
         out = model(video_feat)
         pred = out['output']
         loss, mse, tri = loss_fn(pred, label, out['embed'])
