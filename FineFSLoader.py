@@ -53,6 +53,15 @@ class FineFSDataset(Dataset):
         print('tes_range: ', self.tes_range.info())
 
     def read_video_info(self):
+        suffix_list = ['.mp4.npy', '.pkl']
+        self.suffix = None
+        for suffix in suffix_list:
+            example_file = os.path.join(self.feature_root, '0' + suffix)
+            if os.path.exists(example_file):
+                self.suffix = suffix
+                break
+        if self.suffix is None:
+            raise ValueError('No valid suffix found in the feature root')
         for ann_file in tqdm(self.ann_files):
             ann_path = os.path.join(self.ann_root, ann_file)
             with open(ann_path, 'r') as f:
@@ -123,10 +132,13 @@ class FineFSDataset(Dataset):
     
     def __getitem__(self, idx):
         ann_name = self.ann_files[self.indices[idx]]
-        feature_name = ann_name[:-5] + '.mp4.npy'
+        feature_name = ann_name[:-5] + self.suffix
         with open(os.path.join(self.ann_root, ann_name), 'r') as f:
             data = json.load(f)
-        feature = np.load(os.path.join(self.feature_root, feature_name))
+        if self.suffix == '.mp4.npy':
+            feature = np.load(os.path.join(self.feature_root, feature_name))
+        else:
+            feature = torch.load(os.path.join(self.feature_root, feature_name))
         vlen = feature.shape[0]
         action_list = np.zeros(vlen, dtype=int)
         
@@ -235,7 +247,7 @@ def get_FineFS_loader(ann_root, feature_root, indices_path, batch_size, num_work
 
 if __name__ == '__main__':
     ann_root = 'FineFS/data/annotation'
-    feature_root = 'FineFS/process/SWIN_Feature64'
+    feature_root = 'FineFS/data/video_features'
     indices_path = 'indices/indices_fs_0.pkl'
     
     train_dataset, test_dataset, train_dataloader, test_dataloader = get_FineFS_loader(ann_root, feature_root, indices_path, 2, loader_normalize=False, type='pcs')
